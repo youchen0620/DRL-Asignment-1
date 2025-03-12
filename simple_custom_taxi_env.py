@@ -14,7 +14,7 @@ import random
 
 
 class SimpleTaxiEnv():
-    def __init__(self, grid_size=5, fuel_limit=50):
+    def __init__(self, grid_size=10, fuel_limit=50):
         """
         Custom Taxi environment supporting different grid sizes.
         """
@@ -23,17 +23,34 @@ class SimpleTaxiEnv():
         self.current_fuel = fuel_limit
         self.passenger_picked_up = False
         
-        self.stations = [(0, 0), (0, self.grid_size - 1), (self.grid_size - 1, 0), (self.grid_size - 1, self.grid_size - 1)]
+        self.stations = []
         self.passenger_loc = None
        
-        self.obstacles = set()  # No obstacles in simple version
+        self.obstacles = []  # No obstacles in simple version
         self.destination = None
 
     def reset(self):
         """Reset the environment, ensuring Taxi, passenger, and destination are not overlapping obstacles"""
         self.current_fuel = self.fuel_limit
         self.passenger_picked_up = False
+        self.stations = []
+        self.obstacles = []
+
+        def generate_point():
+            return (random.randint(0, self.grid_size - 1), random.randint(0, self.grid_size - 1))
+
+        def is_adjacent(pos1, pos2):
+            return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1]) < 2
+
+        while len(self.stations) < 4:
+            new_point = generate_point()
+            if all(not is_adjacent(new_point, point) for point in self.stations):
+                self.stations.append(new_point)
         
+        while len(self.stations) < 4:
+            new_point = generate_point()
+            if new_point not in self.stations and all(not is_adjacent(new_point, point) for point in self.obstacles):
+                self.obstacles.append(new_point)
 
         available_positions = [
             (x, y) for x in range(self.grid_size) for y in range(self.grid_size)
@@ -129,7 +146,7 @@ class SimpleTaxiEnv():
         
         state = (taxi_row, taxi_col, self.stations[0][0],self.stations[0][1] ,self.stations[1][0],self.stations[1][1],self.stations[2][0],self.stations[2][1],self.stations[3][0],self.stations[3][1],obstacle_north, obstacle_south, obstacle_east, obstacle_west, passenger_look, destination_look)
         return state
-    def render_env(self, taxi_pos,   action=None, step=None, fuel=None):
+    def render_env(self, taxi_pos,  action=None, step=None, fuel=None):
         clear_output(wait=True)
 
         grid = [['.'] * self.grid_size for _ in range(self.grid_size)]
@@ -140,12 +157,10 @@ class SimpleTaxiEnv():
         if 0 <= px < self.grid_size and 0 <= py < self.grid_size:
             grid[py][px] = 'P'
         '''
-        
-        
-        grid[0][0]='R'
-        grid[0][4]='G'
-        grid[4][0]='Y'
-        grid[4][4]='B'
+        grid[self.stations[0][0]][self.stations[0][1]]='R'
+        grid[self.stations[1][0]][self.stations[1][1]]='G'
+        grid[self.stations[2][0]][self.stations[2][1]]='Y'
+        grid[self.stations[3][0]][self.stations[3][1]]='B'
         '''
         # Place destination
         dy, dx = destination_pos
@@ -186,7 +201,6 @@ def run_agent(agent_file, env_config, render=False):
     total_reward = 0
     done = False
     step_count = 0
-    stations = [(0, 0), (0, 4), (4, 0), (4,4)]
     
     taxi_row, taxi_col, _,_,_,_,_,_,_,_,obstacle_north, obstacle_south, obstacle_east, obstacle_west, passenger_look, destination_look = obs
 
