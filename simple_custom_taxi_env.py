@@ -47,7 +47,7 @@ class SimpleTaxiEnv():
             if all(not is_adjacent(new_point, point) for point in self.stations):
                 self.stations.append(new_point)
         
-        while len(self.stations) < 4:
+        while len(self.obstacles) < 10:
             new_point = generate_point()
             if new_point not in self.stations and all(not is_adjacent(new_point, point) for point in self.obstacles):
                 self.obstacles.append(new_point)
