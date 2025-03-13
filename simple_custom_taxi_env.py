@@ -40,14 +40,14 @@ class SimpleTaxiEnv():
             return (random.randint(0, self.grid_size - 1), random.randint(0, self.grid_size - 1))
 
         def is_adjacent(pos1, pos2):
-            return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1]) < 3
+            return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1]) < 2
 
         while len(self.stations) < 4:
             new_point = generate_point()
             if all(not is_adjacent(new_point, point) for point in self.stations):
                 self.stations.append(new_point)
         
-        while len(self.obstacles) < 10:
+        while len(self.obstacles) < 15:
             new_point = generate_point()
             if new_point not in self.stations and all(not is_adjacent(new_point, point) for point in self.obstacles):
                 self.obstacles.append(new_point)
