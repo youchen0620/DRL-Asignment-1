@@ -46,21 +46,24 @@ def get_action(obs):
                 next_state = get_state(obs, stations[(stations.index(next_state[1]) + 1) % 4], True)
             else:
                 next_state = get_state(obs, next_state[1], False)
+    if not next_state[7] and next_state[0] not in stations and next_state[8] and action == 5:
+        next_state = get_state(obs, next_state[1], False)
     
     current_state = next_state
 
     return action
 
-def train_agent(env, episodes=100000, alpha=0.001, gamma=0.99, epsilon_start=1.0, epsilon_end=0.0, decay_rate=0.99995):
+def train_agent(env, episodes=1000000, alpha=0.001, gamma=0.99, epsilon_start=1.0, epsilon_end=0.0, decay_rate=0.999995):
     global q_table
     rewards_per_episode = []
+    steps_per_episode = []
     epsilon = epsilon_start
     for ep in range(episodes):
         obs, _ = env.reset()
         state = get_state(obs, (obs[2], obs[3]), False)
         done = False
         total_reward = 0
-        visit_count = 0
+        episode_step = 0
         
         while not done:
             if state not in q_table:
@@ -73,12 +76,13 @@ def train_agent(env, episodes=100000, alpha=0.001, gamma=0.99, epsilon_start=1.0
 
             obs, reward, done, _ = env.step(action)
             next_state = get_state(obs, state[1], state[8])
+            episode_step += 1
 
             stations = [(obs[2], obs[3]), (obs[4], obs[5]), (obs[6], obs[7]), (obs[8], obs[9])]
 
             shaped_reward = 0
             if done:
-                shaped_reward += 10 - reward
+                shaped_reward += 50
             if next_state[7] and not next_state[8]:
                 next_state = get_state(obs, stations[(stations.index(next_state[1]) + 1) % 4], False)  
             if state[0] != next_state[0] and next_state[0] in stations and (next_state[6] or (next_state[7] and next_state[8])):
@@ -91,6 +95,8 @@ def train_agent(env, episodes=100000, alpha=0.001, gamma=0.99, epsilon_start=1.0
                     else:
                         next_state = get_state(obs, next_state[1], False)
             if not next_state[7] and next_state[0] not in stations and next_state[8] and action == 5:
+                shaped_reward -= 100
+                episode_step = 50000
                 done = True
 
             reward += shaped_reward
@@ -106,11 +112,13 @@ def train_agent(env, episodes=100000, alpha=0.001, gamma=0.99, epsilon_start=1.0
             state = next_state
 
         rewards_per_episode.append(total_reward)
+        steps_per_episode.append(episode_step)
         epsilon = max(epsilon_end, epsilon * decay_rate)
 
         if (ep + 1) % 100 == 0:
             avg_reward = np.mean(rewards_per_episode[-100:])
-            print(f"🚀 Episode {ep + 1}/{episodes}, Average Reward: {avg_reward:.2f}, Epsilon: {epsilon:.3f}")
+            avg_step = np.mean(steps_per_episode[-100:])
+            print(f"🚀 Episode {ep + 1}/{episodes}, Average Reward: {avg_reward:.2f}, Average Step: {avg_step:.2f}, Epsilon: {epsilon:.3f}")
 
     with open("qtable.pkl", "wb") as f:
         pickle.dump(q_table, f)
