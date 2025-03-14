@@ -22,9 +22,11 @@ def get_action(obs):
     global initialized
     global current_state
 
+    stations = [(obs[2], obs[3]), (obs[4], obs[5]), (obs[6], obs[7]), (obs[8], obs[9])]
+
     if not initialized:
         initialized = True
-        current_state = get_state(obs, (obs[2], obs[3]), False)
+        current_state = get_state(obs, stations[0], False)
     
     state = current_state
 
@@ -35,8 +37,6 @@ def get_action(obs):
         action = int(np.argmax(q_table[state]))
     
     next_state = get_state(obs, state[1], state[8])
-
-    stations = [(obs[2], obs[3]), (obs[4], obs[5]), (obs[6], obs[7]), (obs[8], obs[9])]
 
     if next_state[7] and not next_state[8]:
         next_state = get_state(obs, stations[(stations.index(next_state[1]) + 1) % 4], False)  
@@ -53,7 +53,7 @@ def get_action(obs):
 
     return action
 
-def train_agent(env, episodes=500000, alpha=0.001, gamma=0.99, epsilon_start=1.0, epsilon_end=0.0, decay_rate=0.99999):
+def train_agent(env, episodes=5000000, alpha=0.001, gamma=0.99, epsilon_start=1.0, epsilon_end=0.0, decay_rate=0.999999):
     global q_table
     rewards_per_episode = []
     steps_per_episode = []
