@@ -53,7 +53,7 @@ def get_action(obs):
 
     return action
 
-def train_agent(env, episodes=500000, alpha=0.001, gamma=0.99, epsilon_start=1.0, epsilon_end=0.0, decay_rate=0.99999):
+def train_agent(env, episodes=1000000, alpha=0.001, gamma=0.99, epsilon_start=1.0, epsilon_end=0.0, decay_rate=0.999995):
     global q_table
     rewards_per_episode = []
     steps_per_episode = []
@@ -82,29 +82,21 @@ def train_agent(env, episodes=500000, alpha=0.001, gamma=0.99, epsilon_start=1.0
 
             shaped_reward = 0
             if done:
-                shaped_reward += 100
-            if state[0] == next_state[0] and action in [0, 1, 2, 3]:
-                shaped_reward -= 5
+                shaped_reward += 50
             if next_state[7] and not next_state[8]:
-                next_state = get_state(obs, stations[(stations.index(next_state[1]) + 1) % 4], False)
-            if state[0] != next_state[0] and ((not state[6] and next_state[6] and not next_state[8]) or (not state[7] and next_state[7] and next_state[8])):
-                shaped_reward += 10
-            if state[0] != next_state[0] and ((state[6] and not next_state[6] and not next_state[8]) or (state[7] and not next_state[7] and next_state[8])):
-                shaped_reward -= 10
-            if state[0] != next_state[0] and next_state[0] == next_state[1] and (next_state[6] or (next_state[7] and next_state[8])):
-                shaped_reward += 10
-            if state[0] != next_state[0] and state[0] == state[1]:
-                shaped_reward -= 10
+                next_state = get_state(obs, stations[(stations.index(next_state[1]) + 1) % 4], False)  
+            if state[0] != next_state[0] and next_state[0] in stations and (next_state[6] or (next_state[7] and next_state[8])):
+                shaped_reward += 0.2
             if state[0] == next_state[0] and state[0] in stations and next_state[0] in stations:
                 if next_state[6] and not state[8]:
                     if action == 4:
-                        shaped_reward += 100
+                        shaped_reward += 10
                         next_state = get_state(obs, stations[(stations.index(next_state[1]) + 1) % 4], True)
                     else:
                         next_state = get_state(obs, next_state[1], False)
             if not next_state[7] and next_state[0] not in stations and next_state[8] and action == 5:
-                shaped_reward -= 1000
-                episode_step = 5000
+                shaped_reward -= 100
+                episode_step = 50000
                 done = True
 
             reward += shaped_reward
@@ -136,7 +128,7 @@ if __name__ == '__main__':
     try:
         from simple_custom_taxi_env import SimpleTaxiEnv
         print("Using SimpleTaxiEnv for training.")
-        env = SimpleTaxiEnv(fuel_limit=5000)
+        env = SimpleTaxiEnv(fuel_limit=50000)
     except ImportError:
         print("SimpleTaxiEnv not found, using gym.make('Taxi-v3') instead.")
         env = gym.make("Taxi-v3", render_mode="ansi")
