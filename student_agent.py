@@ -162,7 +162,7 @@ if __name__ == '__main__':
     try:
         from simple_custom_taxi_env import SimpleTaxiEnv
         print("Using SimpleTaxiEnv for training.")
-        env = SimpleTaxiEnv(fuel_limit=50000)
+        env = SimpleTaxiEnv(fuel_limit=5000)
     except ImportError:
         print("SimpleTaxiEnv not found, using gym.make('Taxi-v3') instead.")
         env = gym.make("Taxi-v3", render_mode="ansi")
