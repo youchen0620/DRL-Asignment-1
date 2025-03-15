@@ -62,9 +62,11 @@ def get_action(obs):
     previous_state = state
     previous_action = action
 
+    print(state)
+
     return action
 
-def train_agent(env, episodes=5000000, alpha=0.001, gamma=0.99, epsilon_start=1.0, epsilon_end=0.0, decay_rate=0.999995):
+def train_agent(env, episodes=10000000, alpha=0.001, gamma=0.99, epsilon_start=1.0, epsilon_end=0.0, decay_rate=0.999999):
     global q_table
     rewards_per_episode = []
     steps_per_episode = []
