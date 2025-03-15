@@ -2,6 +2,7 @@ import numpy as np
 import pickle
 import random
 import gym
+import time
 
 try:
     with open("qtable.pkl", "rb") as f:
@@ -45,7 +46,7 @@ def get_action(obs):
     
     state = get_state(obs, previous_state[1], previous_state[8])
 
-    if state[7] and not state[8]:
+    if (state[0] == state[1] and (not state[6] or (not state[7] and state[8]))) or (state[7] and not state[8]):
         state = get_state(obs, stations[(stations.index(state[1]) + 1) % 4], False)
     if previous_state[0] == state[0] and state[0] == state[1]:
         if state[6] and not state[8] and previous_action == 4:
@@ -66,7 +67,7 @@ def get_action(obs):
 
     return action
 
-def train_agent(env, episodes=10000000, alpha=0.001, gamma=0.99, epsilon_start=1.0, epsilon_end=0.0, decay_rate=0.999995):
+def train_agent(env, episodes=1000000, alpha=0.001, gamma=0.99, epsilon_start=1.0, epsilon_end=0.0, decay_rate=0.99999):
     global q_table
     rewards_per_episode = []
     steps_per_episode = []
@@ -89,6 +90,7 @@ def train_agent(env, episodes=10000000, alpha=0.001, gamma=0.99, epsilon_start=1
         done = False
         total_reward = 0
         episode_step = 0
+        previous_pos = None
         
         while not done:
             if state not in q_table:
@@ -111,12 +113,14 @@ def train_agent(env, episodes=10000000, alpha=0.001, gamma=0.99, epsilon_start=1
             curr_dist_to_target = calculate_manhattan_distance(next_state[0], next_state[1])
 
             if curr_dist_to_target < prev_dist_to_target:
-                shaped_reward += 0.2
+                shaped_reward += 10
+            if next_state[0] == previous_pos and action in [0, 1, 2, 3]:
+                shaped_reward -= 10
             if state[0] == next_state[0] and action in [0, 1, 2, 3]:
                 shaped_reward -= 10000
             if state[0] == next_state[0] and ((action == 4 and not state[6] and state[0] != state[1]) or (action == 5 and not state[7] and state[0] != state[1])):
                 shaped_reward -= 10000
-            if next_state[7] and not next_state[8]:
+            if (next_state[0] == next_state[1] and (not next_state[6] or (not next_state[7] and next_state[8]))) or (next_state[7] and not next_state[8]):
                 next_state = get_state(obs, stations[(stations.index(next_state[1]) + 1) % 4], False)
             if state[0] != next_state[0] and ((not state[6] and next_state[6] and not next_state[8]) or (not state[7] and next_state[7] and next_state[8])):
                 shaped_reward += 10
@@ -145,6 +149,7 @@ def train_agent(env, episodes=10000000, alpha=0.001, gamma=0.99, epsilon_start=1
                 reward + gamma * np.max(q_table[next_state]) - q_table[state][action]
             )
 
+            previous_pos = state[0]
             state = next_state
 
         rewards_per_episode.append(total_reward)
