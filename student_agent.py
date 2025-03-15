@@ -102,7 +102,7 @@ def train_agent(env, episodes=1000000, alpha=0.001, gamma=0.99, epsilon_start=1.
             episode_step += 1
 
             shaped_reward = 0
-            if done:
+            if done and episode_step < 200:
                 shaped_reward += 100
 
             prev_dist_to_target = calculate_manhattan_distance(state[0], state[1])
@@ -130,7 +130,7 @@ def train_agent(env, episodes=1000000, alpha=0.001, gamma=0.99, epsilon_start=1.
                     next_state = get_state(obs, stations[(stations.index(next_state[1]) + 1) % 4], True)
             if not next_state[7] and next_state[0] != next_state[1] and next_state[8] and action == 5:
                 shaped_reward -= 10000
-                episode_step = 5000
+                episode_step = 200
                 done = True
 
             reward += shaped_reward
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     try:
         from simple_custom_taxi_env import SimpleTaxiEnv
         print("Using SimpleTaxiEnv for training.")
-        env = SimpleTaxiEnv(fuel_limit=5000)
+        env = SimpleTaxiEnv(fuel_limit=200)
     except ImportError:
         print("SimpleTaxiEnv not found, using gym.make('Taxi-v3') instead.")
         env = gym.make("Taxi-v3", render_mode="ansi")
