@@ -32,7 +32,16 @@ def get_action(obs):
 
     if not initialized:
         initialized = True
-        state = get_state(obs, stations[0], False)
+
+        target_pos = stations[0]
+        for i in range(1, len(stations)):
+            prev_dist_to_target = calculate_manhattan_distance((obs[0], obs[1]), target_pos)
+            curr_dist_to_target = calculate_manhattan_distance((obs[0], obs[1]), stations[i])
+
+            if curr_dist_to_target < prev_dist_to_target:
+                target_pos = stations[i]
+
+        state = get_state(obs, target_pos, False)
 
         action = None
         if state not in q_table:
@@ -67,7 +76,7 @@ def get_action(obs):
 
     return action
 
-def train_agent(env, episodes=1000000, alpha=0.001, gamma=0.99, epsilon_start=1.0, epsilon_end=0.0, decay_rate=0.99999):
+def train_agent(env, episodes=5000000, alpha=0.001, gamma=0.99, epsilon_start=1.0, epsilon_end=0.0, decay_rate=0.999995):
     global q_table
     rewards_per_episode = []
     steps_per_episode = []
