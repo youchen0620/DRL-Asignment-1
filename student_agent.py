@@ -76,7 +76,7 @@ def get_action(obs):
 
     return action
 
-def train_agent(env, episodes=11000000, alpha=0.001, gamma=0.99, epsilon_start=1.0, epsilon_end=0.0, decay_rate=0.999999):
+def train_agent(env, episodes=12000000, alpha=0.001, gamma=0.99, epsilon_start=1.0, epsilon_end=0.0, decay_rate=0.999999):
     global q_table
     rewards_per_episode = []
     steps_per_episode = []
