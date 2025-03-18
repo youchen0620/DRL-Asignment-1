@@ -51,9 +51,9 @@ def get_action(obs):
         if state not in q_table:
             action = random.choice(range(6))
         else:
-            # action = int(np.argmax(q_table[state]))
-            action_probs = softmax(q_table[state])
-            action = int(np.random.choice(len(action_probs), p=action_probs))
+            action = int(np.argmax(q_table[state]))
+            # action_probs = softmax(q_table[state])
+            # action = int(np.random.choice(len(action_probs), p=action_probs))
         
         previous_state = state
 
@@ -73,9 +73,9 @@ def get_action(obs):
     if state not in q_table:
         action = random.choice(range(6))
     else:
-        # action = int(np.argmax(q_table[state]))
-        action_probs = softmax(q_table[state])
-        action = int(np.random.choice(len(action_probs), p=action_probs))
+        action = int(np.argmax(q_table[state]))
+        # action_probs = softmax(q_table[state])
+        # action = int(np.random.choice(len(action_probs), p=action_probs))
 
     previous_state = state
     previous_action = action
