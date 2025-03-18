@@ -34,7 +34,7 @@ def get_action(obs):
 
     stations = [(obs[2], obs[3]), (obs[4], obs[5]), (obs[6], obs[7]), (obs[8], obs[9])]
 
-    if not initialized:
+    if not initialized or calculate_manhattan_distance(previous_state[0], (obs[0], obs[1])) > 1:
         initialized = True
 
         target_pos = stations[0]
@@ -51,11 +51,12 @@ def get_action(obs):
         if state not in q_table:
             action = random.choice(range(6))
         else:
-            action = int(np.argmax(q_table[state]))
-            # action_probs = softmax(q_table[state])
-            # action = int(np.random.choice(len(action_probs), p=action_probs))
+            # action = int(np.argmax(q_table[state]))
+            action_probs = softmax(q_table[state])
+            action = int(np.random.choice(len(action_probs), p=action_probs))
         
         previous_state = state
+        previous_action = action
 
         return action
     
@@ -73,9 +74,9 @@ def get_action(obs):
     if state not in q_table:
         action = random.choice(range(6))
     else:
-        action = int(np.argmax(q_table[state]))
-        # action_probs = softmax(q_table[state])
-        # action = int(np.random.choice(len(action_probs), p=action_probs))
+        # action = int(np.argmax(q_table[state]))
+        action_probs = softmax(q_table[state])
+        action = int(np.random.choice(len(action_probs), p=action_probs))
 
     previous_state = state
     previous_action = action
