@@ -63,10 +63,9 @@ def get_action(obs):
     state = get_state(obs, previous_state[1], previous_state[8])
 
     if state[0] == state[1] and ((not state[6] or (not state[7] and state[8])) or (state[7] and not state[8])):
-        state = get_state(obs, stations[(stations.index(state[1]) + 1) % 4], False)
-    if previous_state[0] == state[0] and state[0] == state[1]:
-        if state[6] and not state[8] and previous_action == 4:
-            state = get_state(obs, stations[(stations.index(state[1]) + 1) % 4], True)
+        state = get_state(obs, stations[(stations.index(state[1]) + 1) % 4], state[8])
+    if previous_state[0] == state[0] and state[0] == state[1] and state[6] and not state[8] and previous_action == 4:
+        state = get_state(obs, stations[(stations.index(state[1]) + 1) % 4], True)
     if not state[7] and state[0] not in stations and state[8] and previous_action == 5:
         state = get_state(obs, state[1], False)
 
@@ -136,7 +135,7 @@ def train_agent(env, episodes=10000000, alpha=0.001, gamma=0.99):
             if state[0] == next_state[0] and ((action == 4 and (state[8] or state[0] != state[1] or not state[6])) or (action == 5 and (not state[8] or state[0] != state[1] or not state[7]))):
                 shaped_reward -= 10000
             if next_state[0] == next_state[1] and ((not next_state[6] or (not next_state[7] and next_state[8])) or (next_state[7] and not next_state[8])):
-                next_state = get_state(obs, stations[(stations.index(next_state[1]) + 1) % 4], False)
+                next_state = get_state(obs, stations[(stations.index(next_state[1]) + 1) % 4], next_state[8])
             if state[0] != next_state[0] and ((not state[6] and next_state[6] and not next_state[8]) or (not state[7] and next_state[7] and next_state[8])):
                 shaped_reward += 10
             if state[0] != next_state[0] and ((state[6] and not next_state[6] and not next_state[8]) or (state[7] and not next_state[7] and next_state[8])):
