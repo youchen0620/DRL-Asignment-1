@@ -19,6 +19,10 @@ def get_state(obs, target_pos, has_picked_up):
 def calculate_manhattan_distance(pos1, pos2):
     return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
+def softmax(x):
+    exp_x = np.exp(x - np.max(x))
+    return exp_x / exp_x.sum()
+
 initialized = False
 previous_state = None
 previous_action = None
@@ -44,10 +48,12 @@ def get_action(obs):
         state = get_state(obs, target_pos, False)
 
         action = None
-        if state not in q_table:
-            action = random.choice(range(6))
-        else:
-            action = int(np.argmax(q_table[state]))
+        # if state not in q_table:
+        #     action = random.choice(range(6))
+        # else:
+        #     action = int(np.argmax(q_table[state]))
+        action_probs = softmax(q_table[state])
+        action = np.random.choice(len(action_probs), p=action_probs)
         
         previous_state = state
 
@@ -64,10 +70,12 @@ def get_action(obs):
         state = get_state(obs, state[1], False)
 
     action = None
-    if state not in q_table:
-        action = random.choice(range(6))
-    else:
-        action = int(np.argmax(q_table[state]))
+    # if state not in q_table:
+    #     action = random.choice(range(6))
+    # else:
+    #     action = int(np.argmax(q_table[state]))
+    action_probs = softmax(q_table[state])
+    action = np.random.choice(len(action_probs), p=action_probs)
 
     previous_state = state
     previous_action = action
@@ -81,10 +89,6 @@ def train_agent(env, episodes=2000000, alpha=0.001, gamma=0.99, epsilon_start=1.
     rewards_per_episode = []
     steps_per_episode = []
     epsilon = epsilon_start
-
-    def softmax(x):
-        exp_x = np.exp(x - np.max(x))
-        return exp_x / exp_x.sum()
 
     for ep in range(episodes):
         obs, _ = env.reset()
