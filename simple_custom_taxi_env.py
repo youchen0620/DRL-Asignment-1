@@ -48,7 +48,7 @@ class SimpleTaxiEnv():
             if all(not is_adjacent(new_point, point) for point in self.stations):
                 self.stations.append(new_point)
         
-        while len(self.obstacles) < self.grid_size * 0.1:
+        while len(self.obstacles) < self.grid_size**2 * 0.1:
             new_point = generate_point()
             if new_point not in self.stations and all(not is_adjacent(new_point, point) for point in self.obstacles):
                 self.obstacles.append(new_point)
@@ -151,6 +151,9 @@ class SimpleTaxiEnv():
         clear_output(wait=True)
 
         grid = [['.'] * self.grid_size for _ in range(self.grid_size)]
+
+        for obstacle in self.obstacles:
+            grid[obstacle[0]][obstacle[1]]='。'
         
         '''
         # Place passenger
