@@ -84,7 +84,7 @@ def get_action(obs):
 
     return action
 
-def train_agent(env, episodes=20000000, alpha=0.001, gamma=0.99):
+def train_agent(env, episodes=10000000, alpha=0.001, gamma=0.99):
     global q_table
     rewards_per_episode = []
     steps_per_episode = []
@@ -129,7 +129,7 @@ def train_agent(env, episodes=20000000, alpha=0.001, gamma=0.99):
             if curr_dist_to_target < prev_dist_to_target:
                 shaped_reward += 10
             if next_state[0] == previous_pos and action in [0, 1, 2, 3]:
-                shaped_reward -= 10
+                shaped_reward -= 100
             if state[0] == next_state[0] and action in [0, 1, 2, 3]:
                 shaped_reward -= 10000
             if state[0] == next_state[0] and ((action == 4 and (state[8] or state[0] != state[1] or not state[6])) or (action == 5 and (not state[8] or state[0] != state[1] or not state[7]))):
