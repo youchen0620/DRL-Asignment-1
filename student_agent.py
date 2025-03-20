@@ -80,7 +80,7 @@ def get_action(obs):
     previous_state = state
     previous_action = action
 
-    # print(state)
+    print(state)
 
     return action
 
