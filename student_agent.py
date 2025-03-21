@@ -26,19 +26,19 @@ def softmax(x):
 initialized = False
 previous_state = None
 previous_action = None
-episode_step = 0
+inference_step = 0
 
 def get_action(obs):
     global initialized
     global previous_state
     global previous_action
-    global episode_step
+    global inference_step
 
     stations = [(obs[2], obs[3]), (obs[4], obs[5]), (obs[6], obs[7]), (obs[8], obs[9])]
 
     if not initialized or (previous_state != None and calculate_manhattan_distance(previous_state[0], (obs[0], obs[1])) > 1):
         initialized = True
-        episode_step = 0
+        inference_step = 0
 
         target_pos = stations[0]
         for i in range(1, len(stations)):
@@ -49,7 +49,7 @@ def get_action(obs):
                 target_pos = stations[i]
 
         state = get_state(obs, target_pos, False)
-        episode_step += 1
+        inference_step += 1
 
         action = None
         if state not in q_table:
@@ -64,17 +64,17 @@ def get_action(obs):
         return action
     
     state = get_state(obs, previous_state[1], previous_state[8])
-    episode_step += 1
+    inference_step += 1
 
-    if (state[0] == state[1] and ((not state[6] or (not state[7] and state[8])) or (state[7] and not state[8]))) or episode_step >= 20:
+    if (state[0] == state[1] and ((not state[6] or (not state[7] and state[8])) or (state[7] and not state[8]))) or inference_step >= 20:
         state = get_state(obs, stations[(stations.index(state[1]) + 1) % 4], state[8])
-        episode_step = 0
+        inference_step = 0
     if previous_state[0] == state[0] and state[0] == state[1] and state[6] and not state[8] and previous_action == 4:
         state = get_state(obs, stations[(stations.index(state[1]) + 1) % 4], True)
-        episode_step = 0
+        inference_step = 0
     if not state[7] and state[0] not in stations and state[8] and previous_action == 5:
         state = get_state(obs, state[1], False)
-        episode_step = 0
+        inference_step = 0
 
     action = None
     if state not in q_table:
@@ -86,11 +86,9 @@ def get_action(obs):
     previous_state = state
     previous_action = action
 
-    print(state)
-
     return action
 
-def train_agent(env, episodes=10000000, alpha=0.001, gamma=0.99):
+def train_agent(env, episodes=5000000, alpha=0.001, gamma=0.99):
     global q_table
     rewards_per_episode = []
     steps_per_episode = []
