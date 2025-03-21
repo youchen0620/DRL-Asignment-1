@@ -51,7 +51,6 @@ def get_action(obs):
         if state not in q_table:
             action = random.choice(range(6))
         else:
-            # action = int(np.argmax(q_table[state]))
             action_probs = softmax(q_table[state])
             action = int(np.random.choice(len(action_probs), p=action_probs))
         
@@ -73,18 +72,15 @@ def get_action(obs):
     if state not in q_table:
         action = random.choice(range(6))
     else:
-        # action = int(np.argmax(q_table[state]))
         action_probs = softmax(q_table[state])
         action = int(np.random.choice(len(action_probs), p=action_probs))
 
     previous_state = state
     previous_action = action
 
-    print(state)
-
     return action
 
-def train_agent(env, episodes=20000000, alpha=0.001, gamma=0.99):
+def train_agent(env, episodes=10000000, alpha=0.001, gamma=0.99):
     global q_table
     rewards_per_episode = []
     steps_per_episode = []
