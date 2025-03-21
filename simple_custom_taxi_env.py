@@ -4,6 +4,7 @@ import importlib.util
 import time
 from IPython.display import clear_output
 import random
+from collections import deque
 # This environment allows you to verify whether your program runs correctly during testing, 
 # as it follows the same observation format from `env.reset()` and `env.step()`. 
 # However, keep in mind that this is just a simplified environment. 
@@ -28,6 +29,29 @@ class SimpleTaxiEnv():
        
         self.obstacles = []  # No obstacles in simple version
         self.destination = None
+    
+    def is_fully_connected(self, available_positions):
+        """Check if all available positions are connected using BFS"""
+        if not available_positions:
+            return False
+
+        start = available_positions[0]  # Pick a random starting point
+        visited = set()
+        queue = deque([start])
+
+        while queue:
+            x, y = queue.popleft()
+            if (x, y) in visited:
+                continue
+            visited.add((x, y))
+
+            # Explore neighbors (up, down, left, right)
+            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                neighbor = (x + dx, y + dy)
+                if neighbor in available_positions and neighbor not in visited:
+                    queue.append(neighbor)
+
+        return len(visited) == len(available_positions)
 
     def reset(self):
         """Reset the environment, ensuring Taxi, passenger, and destination are not overlapping obstacles"""
@@ -57,6 +81,9 @@ class SimpleTaxiEnv():
             (x, y) for x in range(self.grid_size) for y in range(self.grid_size)
             if (x, y) not in self.stations and (x, y) not in self.obstacles
         ]
+
+        if not self.is_fully_connected(available_positions):
+            return self.reset()
 
         self.taxi_pos = random.choice(available_positions)
         
