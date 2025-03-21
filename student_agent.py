@@ -84,7 +84,7 @@ def get_action(obs):
 
     return action
 
-def train_agent(env, episodes=10000000, alpha=0.001, gamma=0.99):
+def train_agent(env, episodes=20000000, alpha=0.001, gamma=0.99):
     global q_table
     rewards_per_episode = []
     steps_per_episode = []
@@ -122,8 +122,8 @@ def train_agent(env, episodes=10000000, alpha=0.001, gamma=0.99):
             shaped_reward = 0
             if done and episode_step < 200:
                 shaped_reward += 100
-            if done and episode_step >= 200:
-                shaped_reward -= 100
+            # if done and episode_step >= 200:
+            #     shaped_reward -= 100
 
             prev_dist_to_target = calculate_manhattan_distance(state[0], state[1])
             curr_dist_to_target = calculate_manhattan_distance(next_state[0], next_state[1])
