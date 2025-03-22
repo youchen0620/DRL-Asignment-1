@@ -66,7 +66,7 @@ def get_action(obs):
     state = get_state(obs, previous_state[1], previous_state[8])
     inference_step += 1
 
-    if (state[0] == state[1] and ((not state[6] or (not state[7] and state[8])) or (state[7] and not state[8]))) or inference_step >= 20:
+    if (state[0] == state[1] and ((not state[6] or (not state[7] and state[8])) or (state[7] and not state[8]))) or inference_step >= 30:
         state = get_state(obs, stations[(stations.index(state[1]) + 1) % 4], state[8])
         inference_step = 0
     if previous_state[0] == state[0] and state[0] == state[1] and state[6] and not state[8] and previous_action == 4:
@@ -127,7 +127,7 @@ def train_agent(env, episodes=5000000, alpha=0.001, gamma=0.99):
             if done and episode_step < 200:
                 shaped_reward += 100
             elif done and episode_step >= 200:
-                shaped_reward -= 100
+                shaped_reward -= 200
 
             prev_dist_to_target = calculate_manhattan_distance(state[0], state[1])
             curr_dist_to_target = calculate_manhattan_distance(next_state[0], next_state[1])
