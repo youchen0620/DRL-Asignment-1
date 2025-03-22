@@ -126,7 +126,7 @@ def train_agent(env, episodes=5000000, alpha=0.001, gamma=0.99):
             shaped_reward = 0
             if done and episode_step < 200:
                 shaped_reward += 100
-            elif done and episode_step >= 200:
+            if done and episode_step >= 200:
                 shaped_reward -= 200
 
             prev_dist_to_target = calculate_manhattan_distance(state[0], state[1])
